@@ -5,7 +5,12 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  useCdn: false, // Set to false for development to get fresh data
+  perspective: 'published', // Only fetch published documents
+  stega: {
+    enabled: process.env.NODE_ENV === 'development',
+    studioUrl: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL || `https://${projectId}.sanity.studio`,
+  },
 })
 
 // Helper function for fetching data with error handling
@@ -13,17 +18,26 @@ export async function sanityFetch<T>({
   query,
   params = {},
   tags,
+  revalidate,
 }: {
   query: string
   params?: any
   tags?: string[]
+  revalidate?: number | false
 }): Promise<T> {
   try {
-    return await client.fetch<T>(query, params, {
+    const fetchOptions: any = {
       next: {
         tags,
       },
-    })
+    }
+    
+    // Add revalidate option if provided
+    if (revalidate !== undefined) {
+      fetchOptions.next.revalidate = revalidate
+    }
+    
+    return await client.fetch<T>(query, params, fetchOptions)
   } catch (error) {
     console.error('Sanity fetch error:', error)
     throw error
@@ -34,7 +48,7 @@ export async function sanityFetch<T>({
 export const queries = {
   // Hero Section - More flexible query
   getHeroSection: (language: string = 'id') => `
-    *[_type == "heroSection"][0] {
+    *[_type == "heroSection" && language == "${language}" && isActive == true] | order(_updatedAt desc) [0] {
       _id,
       title,
       subtitle,
@@ -57,7 +71,7 @@ export const queries = {
 
   // Features Section - More flexible query  
   getFeaturesSection: (language: string = 'id') => `
-    *[_type == "featuresSection"] | order(_createdAt desc) [0] {
+    *[_type == "featuresSection" && language == "${language}" && isActive == true] | order(_updatedAt desc) [0] {
       _id,
       sectionTitle,
       sectionSubtitle,

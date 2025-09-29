@@ -14,21 +14,10 @@ import { generateBlogPostJsonLd, generateBreadcrumbJsonLd } from '@/lib/jsonLd'
 import { sanityFetch, queries } from '@/sanity/lib/client'
 import { Calendar, User, Clock, Tag, ArrowLeft, Share2 } from 'lucide-react'
 
-// Force dynamic rendering
+// Force dynamic rendering to prevent static export issues
 export const dynamic = 'force-dynamic'
 
-// Generate static params for published posts
-export async function generateStaticParams() {
-  try {
-    const posts = await blogService.getAllPosts('id', 1, 50)
-    return posts.posts.map((post) => ({
-      slug: post.slug.current,
-    }))
-  } catch (error) {
-    console.error('Error generating static params:', error)
-    return []
-  }
-}
+
 
 // Generate metadata
 export async function generateMetadata({
@@ -180,7 +169,7 @@ export default async function BlogPostPage({
 
     const readingTime = blogUtils.calculateReadingTime(post.content)
     const publishedDate = blogUtils.formatDate(post.publishedAt)
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mhstour.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://travel.mahabbatussholihin.com'
 
     // Generate structured data
     const jsonLd = generateBlogPostJsonLd(post, baseUrl)
@@ -326,7 +315,7 @@ export default async function BlogPostPage({
                     <Link
                       key={tag}
                       href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="inline-flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-primary hover:text-white transition-all duration-200"
+                      className="inline-flex items-center px-3 py-1 text-sm bg-accent text-primary-dark rounded-full hover:bg-primary-light transition-colors duration-200"
                     >
                       #{tag}
                     </Link>
@@ -368,7 +357,7 @@ export default async function BlogPostPage({
                 <div className="text-center mt-12">
                   <Link
                     href="/blog"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark transition-colors duration-200"
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md bg-accent text-primary-dark hover:bg-primary-light transition-colors duration-200"
                   >
                     Lihat Semua Artikel
                   </Link>

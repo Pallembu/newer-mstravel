@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
@@ -75,12 +75,12 @@ const Header = () => {
   }, [])
 
   const navigation = [
-    { name: siteSettings?.navigation?.homeText || 'Home', href: '/' },
-    { name: siteSettings?.navigation?.aboutText || 'About', href: '/about' },
-    { name: siteSettings?.navigation?.servicesText || 'Services', href: '/services' },
-    { name: siteSettings?.navigation?.galleryText || 'Gallery', href: '/gallery' },
+    { name: siteSettings?.navigation?.homeText || 'Beranda', href: '/' },
+    { name: siteSettings?.navigation?.aboutText || 'Tentang', href: '/about' },
+    { name: siteSettings?.navigation?.servicesText || 'Layanan', href: '/services' },
+    { name: siteSettings?.navigation?.galleryText || 'Galeri', href: '/gallery' },
     { name: siteSettings?.navigation?.blogText || 'Blog', href: '/blog' },
-    { name: siteSettings?.navigation?.contactText || 'Contact', href: '/contact' },
+    { name: siteSettings?.navigation?.contactText || 'Kontak', href: '/contact' },
   ]
 
   const isActive = (href: string) => {
@@ -101,20 +101,14 @@ const Header = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              {siteSettings?.logo ? (
-                <Image
-                  src={urlFor(siteSettings.logo).width(200).height(60).url()}
-                  alt={siteSettings.logoAlt || 'Company Logo'}
-                  width={200}
-                  height={60}
-                  className="h-10 w-auto"
-                  priority
-                />
-              ) : (
-                <span className="text-2xl font-bold text-primary">
-                  {siteSettings?.siteName }
-                </span>
-              )}
+              <Image
+                src="/main-logo.png"
+                alt="Mahabbatussholihin Tour & Travel"
+                width={400}
+                height={400}
+                className="h-24 w-auto"
+                priority
+              />
             </Link>
           </div>
 
@@ -136,13 +130,7 @@ const Header = () => {
           </nav>
 
           {/* CTA Button */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link
-              href="/contact"
-              className={siteSettings?.theme?.buttons?.primaryButton || 'bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors duration-200'}
-            >
-              {siteSettings?.content?.bookNowText || 'Book Now'}
-            </Link>
+          <div className="hidden md:flex items-center space-x-8">
           </div>
 
           {/* Mobile menu button */}
@@ -152,7 +140,7 @@ const Header = () => {
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
               aria-expanded="false"
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">Buka menu utama</span>
               {/* Hamburger icon */}
               <svg
                 className={`${isMenuOpen ? 'hidden' : 'block'} h-6 w-6`}
@@ -213,7 +201,7 @@ const Header = () => {
               className={`block w-full text-center ${siteSettings?.theme?.buttons?.primaryButton || 'bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors duration-200'}`}
               onClick={() => setIsMenuOpen(false)}
             >
-              {siteSettings?.content?.bookNowText || 'Book Now'}
+              {siteSettings?.content?.bookNowText || 'Pesan Sekarang'}
             </Link>
           </div>
         </div>
