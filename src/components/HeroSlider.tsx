@@ -64,15 +64,24 @@ function cleanText(text: string | undefined | null): string {
   
   // Remove Unicode corruption patterns and zero-width characters
   return text
-    .replace(/​​​​‌﻿‍﻿​‍​‍‌‍﻿﻿‌﻿​‍‌‍‍‌‌‍‌﻿‌‍‍‌‌‍﻿‍​‍​‍​﻿‍‍​‍​‍‌﻿​﻿‌‍​‌‌‍﻿‍‌‍‍‌‌﻿‌​‌﻿‍‌​‍﻿‍‌‍‍‌‌‍﻿﻿​‍​‍​‍﻿​​‍​‍‌‍‍​‌﻿​‍‌‍‌‌‌‍‌‍​‍​‍​﻿‍‍​‍​‍‌‍‍​‌﻿‌​‌﻿‌​‌﻿​​‌﻿​﻿​﻿‍‍​‍﻿﻿​‍﻿﻿‌﻿​​‌‍‍‌‌﻿‌﻿‌‍﻿‌‌﻿‍​​﻿‌‍‌‍‌‍‌‍‍​​‍﻿‍‌﻿​﻿‌‍​‌‌‍﻿‍‌‍‍‌‌﻿‌​‌﻿‍‌​‍﻿‍‌﻿​﻿‌﻿‌​‌﻿‌‌‌‍‌​‌‍‍‌‌‍﻿﻿​‍﻿﻿‌‍‍‌‌‍﻿‍‌﻿‌​‌‍‌‌‌‍﻿‍‌﻿‌​​‍﻿﻿‌‍‌‌‌‍‌​‌‍‍‌‌﻿‌​​‍﻿﻿‌‍﻿‌‌‍﻿﻿‌‍‌​‌‍‌‌​﻿﻿‌‌﻿​​‌﻿​‍‌‍‌‌‌﻿​﻿‌‍‌‌‌‍﻿‍‌﻿‌​‌‍​‌‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍​﻿‍﻿‌‍‍‌‌‍‌​​﻿﻿‌‌‍‍​‌‍‌‌‌﻿​‍‌‍﻿﻿‌‌​﻿‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍​﻿‍﻿‌﻿‌​‌﻿‍‌‌﻿​​‌‍‌‌​﻿﻿‌‌‍‍​‌‍‌‌‌﻿​‍‌‍﻿﻿‌‌​﻿‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍​﻿‍﻿‌﻿​​‌‍​‌‌﻿‌​‌‍‍​​﻿﻿‌‌﻿​﻿‌‍﻿​‌‍‍‌‌‍‌​‌‍‌‌‌﻿​‍‌​‍‌‌‍﻿‌‌‍​‌‌‍‌﻿‌‍‌‌‌﻿​﻿​‍‌‌​﻿‌‌‌​​‍‌‌﻿﻿‌‍‍﻿‌‍‌‌‌﻿‍‌​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​﻿‌​‌​​‍‌‌​﻿​‍​﻿​‍​﻿‌﻿​﻿‍​​﻿​‍​﻿‍‌​﻿​‌​﻿‍‌‌‍‌‍‌‍​﻿‌‍‌‍​﻿​﻿​﻿‍​‌‍​‌​‍‌‌​﻿​‍​﻿​‍​‍‌‌​﻿‌‌‌​‌​​‍﻿‍‌‍​﻿‌‍​‌‌﻿​​‌﻿‌​‌‍‍‌‌‍﻿﻿‌‍﻿‍​‍‌‍‌﻿​​‌‍‌‌‌﻿​‍‌﻿​﻿‌﻿​​‌‍‌‌‌‍​﻿‌﻿‌​‌‍‍‌‌﻿‌‍‌‍‌‌​﻿﻿‌‌﻿​​‌﻿‌‌‌‍​‍‌‍﻿​‌‍‍‌‌﻿​﻿‌‍‍​‌‍‌‌‌‍‌​​‍​‍‌﻿﻿‌/g, '')
-    .replace(/[​‌‍﻿]/g, '') // Remove any remaining zero-width characters
-    .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove additional zero-width characters
+    .replace(/[\u200B-\u200D\uFEFF]/g, '') // Zero-width characters
+    .replace(/[\u2060-\u206F]/g, '') // Word joiner and other invisible characters
+    .replace(/[\u00AD]/g, '') // Soft hyphen
+    .replace(/[\u202A-\u202E]/g, '') // Directional marks
+    .replace(/[\u2066-\u2069]/g, '') // Directional isolates
+    .replace(/[\u061C]/g, '') // Arabic letter mark
+    .replace(/[\u180E]/g, '') // Mongolian vowel separator
+    .replace(/[\uFFF9-\uFFFB]/g, '') // Interlinear annotation characters
+    .replace(/[\u034F]/g, '') // Combining grapheme joiner
+    .replace(/[\u17B4-\u17B5]/g, '') // Khmer vowel inherent
+    .replace(/[\u0001-\u001F\u007F-\u009F]/g, '') // Control characters
+    .replace(/\uFFFD/g, '') // Replacement character
     .trim()
 }
 
 export default function HeroSlider({
-  title: globalTitle,
-  subtitle: globalSubtitle,
+  title,
+  subtitle,
   ctaText,
   ctaLink,
   sliderImages,
@@ -81,219 +90,196 @@ export default function HeroSlider({
 }: HeroSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
-  
-  // Touch/swipe handling refs
-  const touchStartX = useRef<number>(0)
-  const touchEndX = useRef<number>(0)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Clean the text data
-  const cleanTitle = cleanText(globalTitle) || 'Mahabbatussholihin Tour & Travel'
-  const cleanSubtitle = cleanText(globalSubtitle) || 'Mendampingi Jamaah Haji dan Umroh, InsyaAllah Amanah dalam memberangkatkan para Jamaah ke tanah suci'
-  const cleanCtaText = cleanText(ctaText) || 'Info lebih lanjut'
-  const cleanCtaLink = cleanText(ctaLink) || 'https://wa.me/6287770005801'
+  // Clean and prepare slider settings
+  const settings = useMemo(() => ({
+    autoplay: sliderSettings?.autoplay ?? sliderSettings?.autoPlay ?? true,
+    interval: (sliderSettings?.interval ?? sliderSettings?.autoPlayInterval ?? 5) * 1000,
+    showNavigation: sliderSettings?.showNavigation ?? true,
+    showDots: sliderSettings?.showDots ?? true,
+    pauseOnHover: sliderSettings?.pauseOnHover ?? true
+  }), [sliderSettings])
 
-  // Default settings - remove navigation, dots, and pause on hover
-  const settings = useMemo(() => {
-    // Handle both CMS naming conventions and null values
-    const autoplayValue = sliderSettings?.autoplay ?? sliderSettings?.autoPlay ?? true
-    const intervalValue = sliderSettings?.interval ?? sliderSettings?.autoPlayInterval ?? 5
+  // Clean text data
+  const cleanTitle = cleanText(title) || "Mahabbatussholihin Tour & Travel"
+  const cleanSubtitle = cleanText(subtitle) || "Mendampingi Jamaah Haji dan Umrah"
+  const cleanCtaText = cleanText(ctaText) || "Info lebih lanjut"
+
+  // Process slider images with cleaned text
+  const processedImages = useMemo(() => {
+    if (!sliderImages || sliderImages.length === 0) return []
     
-    return {
-      autoplay: autoplayValue,
-      interval: intervalValue < 100 ? intervalValue * 1000 : intervalValue, // Convert seconds to milliseconds if needed
-      ...sliderSettings,
-      // Override these settings regardless of what comes from CMS
-      showNavigation: false,
-      showDots: false,
-      pauseOnHover: false
-    }
-  }, [sliderSettings])
+    return sliderImages.map(img => ({
+      ...img,
+      alt: cleanText(img.alt) || 'Hero image',
+      title: cleanText(img.title),
+      subtitle: cleanText(img.subtitle),
+      caption: cleanText(img.caption)
+    }))
+  }, [sliderImages])
 
-  // Use slider images if available, otherwise fallback to background image
-  const images = sliderImages && sliderImages.length > 0 
-    ? sliderImages.map(img => ({
-        ...img,
-        alt: cleanText(img.alt) || 'Hero image',
-        caption: cleanText(img.caption),
-        title: cleanText(img.title),
-        subtitle: cleanText(img.subtitle)
-      }))
-    : backgroundImage 
-    ? [{ 
-        image: backgroundImage, 
-        alt: cleanText(backgroundImage.alt) || 'Hero background',
-        caption: undefined,
-        title: undefined,
-        subtitle: undefined
-      }] 
-    : []
-
-  // Get current slide's text content or fallback to global
-  const currentImage = images[currentSlide]
-  const displayTitle = currentImage?.title || cleanTitle
-  const displaySubtitle = currentImage?.subtitle || cleanSubtitle
+  const hasMultipleSlides = processedImages.length > 1
 
   // Auto-play functionality
-  useEffect(() => {
-    if (!settings.autoplay || !isPlaying || images.length === 0) return
-
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % images.length)
+  const startAutoplay = useCallback(() => {
+    if (!settings.autoplay || !hasMultipleSlides) return
+    
+    intervalRef.current = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % processedImages.length)
     }, settings.interval)
+  }, [settings.autoplay, settings.interval, hasMultipleSlides, processedImages.length])
 
-    return () => clearInterval(interval)
-  }, [settings.autoplay, settings.interval, isPlaying, images.length])
+  const stopAutoplay = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }, [])
+
+  // Initialize autoplay
+  useEffect(() => {
+    if (isPlaying) {
+      startAutoplay()
+    } else {
+      stopAutoplay()
+    }
+
+    return () => stopAutoplay()
+  }, [isPlaying, startAutoplay, stopAutoplay])
 
   // Navigation functions
-  const goToNext = useCallback(() => {
-    if (images.length > 1) {
-      setCurrentSlide((prev) => (prev + 1) % images.length)
-    }
-  }, [images.length])
-
-  const goToPrevious = useCallback(() => {
-    if (images.length > 1) {
-      setCurrentSlide((prev) => (prev - 1 + images.length) % images.length)
-    }
-  }, [images.length])
-
-  const goToSlide = useCallback((index: number) => {
-    if (index >= 0 && index < images.length) {
-      setCurrentSlide(index)
-    }
-  }, [images.length])
-
-  // Touch/Swipe handlers for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index)
   }
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX
+  const nextSlide = () => {
+    setCurrentSlide(prev => (prev + 1) % processedImages.length)
   }
 
-  const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return
-    
-    const distance = touchStartX.current - touchEndX.current
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
+  const prevSlide = () => {
+    setCurrentSlide(prev => (prev - 1 + processedImages.length) % processedImages.length)
+  }
 
-    if (isLeftSwipe && images.length > 1) {
-      goToNext()
-    }
-    if (isRightSwipe && images.length > 1) {
-      goToPrevious()
+  // Mouse event handlers
+  const handleMouseEnter = () => {
+    if (settings.pauseOnHover) {
+      setIsPlaying(false)
     }
   }
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
-        goToPrevious()
-      } else if (event.key === 'ArrowRight') {
-        goToNext()
-      }
+  const handleMouseLeave = () => {
+    if (settings.pauseOnHover) {
+      setIsPlaying(true)
     }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [goToNext, goToPrevious])
-
-  // Fallback UI when no images are available
-  if (!images || images.length === 0) {
-    return (
-      <section className="relative h-screen bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-        <div className="text-center text-white px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">{displayTitle}</h1>
-          <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-white">{displaySubtitle}</p>
-          <Link
-            href={cleanCtaLink}
-            className="inline-block bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            target={cleanCtaLink.startsWith('http') ? '_blank' : '_self'}
-            rel={cleanCtaLink.startsWith('http') ? 'noopener noreferrer' : undefined}
-          >
-            {cleanCtaText}
-          </Link>
-        </div>
-      </section>
-    )
   }
+
+  // Get current slide data
+  const currentSlideData = processedImages[currentSlide]
+  const displayTitle = currentSlideData?.title || cleanTitle
+  const displaySubtitle = currentSlideData?.subtitle || cleanSubtitle
 
   return (
     <section 
-      className="relative h-screen overflow-hidden"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      className="relative h-screen flex items-center justify-center overflow-hidden"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Background Images */}
-      <div className="absolute inset-0">
-        {images.map((slideImage, index) => (
+      {hasMultipleSlides ? (
+        processedImages.map((slide, index) => (
           <div
-            key={`slide-${index}`}
+            key={slide.image.asset._id}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
             <Image
-              src={urlForHero(slideImage.image).url()}
-              alt={slideImage.alt}
+              src={urlForHero(slide.image).width(1920).height(1080).url()}
+              alt={slide.alt}
               fill
               className="object-cover"
               priority={index === 0}
               sizes="100vw"
             />
-            {/* Slide Caption */}
-            {slideImage.caption && (
-              <div className="absolute bottom-4 left-4 bg-black/60 text-white px-4 py-2 rounded-lg">
-                <p className="text-sm font-medium">{slideImage.caption}</p>
-              </div>
-            )}
           </div>
-        ))}
-        <div className="absolute inset-0 bg-black/30 z-10"></div>
-      </div>
+        ))
+      ) : backgroundImage ? (
+        <Image
+          src={urlForHero(backgroundImage).width(1920).height(1080).url()}
+          alt={cleanText(backgroundImage.alt) || 'Hero background'}
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700" />
+      )}
 
-      {/* Hero Content */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center lg:justify-start px-4 sm:px-6 lg:px-32 lg:items-start lg:pt-32 lg:pl-64">
-        <div className="max-w-4xl text-center lg:text-left">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-2xl">
-            {displayTitle}
-          </h1>
-          <p className="text-md sm:text-lg md:text-xl text-white mb-8 max-w-2xl drop-shadow-2xl mx-auto lg:mx-0 leading-relaxed">
-            {displaySubtitle}
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* Content */}
+      <div className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+          {displayTitle}
+        </h1>
+        <p className="text-lg sm:text-xl lg:text-2xl mb-8 leading-relaxed max-w-3xl mx-auto">
+          {displaySubtitle}
+        </p>
+        {currentSlideData?.caption && (
+          <p className="text-base sm:text-lg mb-8 text-gray-200">
+            {currentSlideData.caption}
           </p>
-          <div className="flex justify-center lg:justify-start">
-            <Link
-              href={cleanCtaLink}
-              className="inline-block bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl "
-              target={cleanCtaLink.startsWith('http') ? '_blank' : '_self'}
-              rel={cleanCtaLink.startsWith('http') ? 'noopener noreferrer' : undefined}
-            >
-              {cleanCtaText}
-            </Link>
-          </div>
-        </div>
+        )}
+        <Link
+          href={ctaLink}
+          className="inline-block bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-8 rounded-lg transition-colors duration-300 text-lg"
+        >
+          {cleanCtaText}
+        </Link>
       </div>
 
-      {/* Dot Indicators - Desktop Only */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 hidden lg:flex space-x-2">
-        {images.map((_, index) => (
+      {/* Navigation Arrows */}
+      {hasMultipleSlides && settings.showNavigation && (
+        <>
           <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentSlide
-                ? 'bg-white scale-125'
-                : 'bg-white/50 hover:bg-white/75'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-300"
+            aria-label="Previous slide"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-300"
+            aria-label="Next slide"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
 
+      {/* Dot Indicators */}
+      {hasMultipleSlides && settings.showDots && (
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3">
+          {processedImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                index === currentSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

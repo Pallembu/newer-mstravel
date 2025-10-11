@@ -74,16 +74,16 @@ export async function generateMetadata({
   }
 }
 
-// Portable Text components
+// Portable Text components with original 1350x1080 resolution
 const portableTextComponents = {
   types: {
     image: ({ value }: any) => (
       <div className="my-6 sm:my-8">
         <Image
-          src={urlFor(value).width(800).height(600).url()}
+          src={urlFor(value).width(1350).height(1080).url()}
           alt={value.alt || 'Blog image'}
-          width={800}
-          height={600}
+          width={1350}
+          height={1080}
           className="rounded-lg shadow-lg w-full h-auto"
           placeholder={value.asset?.metadata?.lqip ? 'blur' : 'empty'}
           blurDataURL={value.asset?.metadata?.lqip}

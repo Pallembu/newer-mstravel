@@ -1,23 +1,25 @@
 import { Metadata } from 'next'
-import { PortableText } from '@portabletext/react'
+import Image from 'next/image'
 import { sanityFetch, queries } from '@/sanity/lib/client'
+import { urlFor } from '@/sanity/lib/image'
+import { PortableText } from '@portabletext/react'
 import AnimatedSection, { PageTransition, StaggerContainer, StaggerItem } from '@/components/AnimatedSection'
 import { generateOrganizationJsonLd, generateBreadcrumbJsonLd } from '@/lib/jsonLd'
 
-// Portable Text components for styling
+// Portable Text components
 const portableTextComponents = {
   block: {
     normal: ({ children }: any) => (
-      <p className="text-gray-700 leading-relaxed mb-4">{children}</p>
+      <p className="text-base text-gray-700 leading-7 mb-6 font-normal">{children}</p>
     ),
     h1: ({ children }: any) => (
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">{children}</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6 mt-8 first:mt-0">{children}</h1>
     ),
     h2: ({ children }: any) => (
-      <h2 className="text-xl font-bold text-gray-900 mb-3">{children}</h2>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4 mt-6 first:mt-0">{children}</h2>
     ),
     h3: ({ children }: any) => (
-      <h3 className="text-lg font-bold text-gray-900 mb-2">{children}</h3>
+      <h3 className="text-lg font-medium text-gray-900 mb-3 mt-5 first:mt-0">{children}</h3>
     ),
   },
   marks: {
@@ -25,14 +27,14 @@ const portableTextComponents = {
       <strong className="font-semibold text-gray-900">{children}</strong>
     ),
     em: ({ children }: any) => (
-      <em className="italic">{children}</em>
+      <em className="italic text-gray-700">{children}</em>
     ),
     link: ({ children, value }: any) => (
       <a
         href={value.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-primary hover:text-primary-dark underline"
+        className="text-primary hover:text-primary-dark underline font-medium"
       >
         {children}
       </a>
@@ -149,12 +151,7 @@ export default async function AboutPage() {
               {aboutUs?.contentSection?.ourStory?.title || 'Cerita Kami'}
             </h2>
             <div className="text-gray-700 text-center sm:text-left">
-              {aboutUs?.contentSection?.ourStory?.content && (
-                <PortableText
-                  value={aboutUs.contentSection.ourStory.content}
-                  components={portableTextComponents}
-                />
-              )}
+              <PortableText value={aboutUs?.contentSection?.ourStory?.content} components={portableTextComponents} />
             </div>
           </div>
         </AnimatedSection>
@@ -169,12 +166,9 @@ export default async function AboutPage() {
             </h2>
             <div className="text-gray-700 text-center sm:text-left">
               {aboutUs?.contentSection?.ourMission?.content ? (
-                <PortableText
-                  value={aboutUs.contentSection.ourMission.content}
-                  components={portableTextComponents}
-                />
+                <PortableText value={aboutUs.contentSection.ourMission.content} components={portableTextComponents} />
               ) : (
-                <p>Dengan ridho Alloh SWT, kami berkomitmen nyediain layanan perjalanan yang berkah dan penuh makna yang bisa melampaui ekspektasi jamaah kami sambil menjaga amanah dan tanggung jawab dalam setiap langkah perjalanan.</p>
+                <p className="text-base text-gray-700 leading-7 mb-6 font-normal">Dengan ridho Alloh SWT, kami berkomitmen nyediain layanan perjalanan yang berkah dan penuh makna yang bisa melampaui ekspektasi jamaah kami sambil menjaga amanah dan tanggung jawab dalam setiap langkah perjalanan.</p>
               )}
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
+import { PortableText } from '@portabletext/react'
 import { urlForProduct } from '@/sanity/lib/image'
 import { X, Check, Star, MapPin, Clock, Users } from 'lucide-react'
 import AnimatedSection, { StaggerContainer, StaggerItem } from './AnimatedSection'
@@ -18,7 +19,7 @@ interface ServicePackage {
   _id: string
   title: string
   slug: { current: string }
-  description: string
+  description: any // Changed from string to any to support portable text
   icon?: {
     asset: {
       _id: string
@@ -26,7 +27,7 @@ interface ServicePackage {
     }
     alt?: string
   }
-  features: string[]
+  features: any // Changed from string[] to any to support portable text
   price?: ServicePrice
   category: string
   isPopular: boolean
@@ -100,6 +101,64 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
 
   if (!isVisible || !service) return null
 
+  // Portable Text components
+  const portableTextComponents = {
+    block: {
+      normal: ({ children }: any) => (
+        <p className="text-base text-gray-600 leading-relaxed mb-4">
+          {children}
+        </p>
+      ),
+      h1: ({ children }: any) => (
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">{children}</h1>
+      ),
+      h2: ({ children }: any) => (
+        <h2 className="text-xl font-semibold text-gray-900 mb-3">{children}</h2>
+      ),
+      h3: ({ children }: any) => (
+        <h3 className="text-lg font-medium text-gray-900 mb-2">{children}</h3>
+      ),
+    },
+    marks: {
+      strong: ({ children }: any) => (
+        <strong className="font-semibold text-gray-900">{children}</strong>
+      ),
+      em: ({ children }: any) => (
+        <em className="italic">{children}</em>
+      ),
+      link: ({ children, value }: any) => (
+        <a
+          href={value.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-dark underline"
+        >
+          {children}
+        </a>
+      ),
+    },
+    list: {
+      bullet: ({ children }: any) => (
+        <ul className="list-disc list-inside space-y-2 mb-4 text-gray-600">
+          {children}
+        </ul>
+      ),
+      number: ({ children }: any) => (
+        <ol className="list-decimal list-inside space-y-2 mb-4 text-gray-600">
+          {children}
+        </ol>
+      ),
+    },
+    listItem: {
+      bullet: ({ children }: any) => (
+        <li className="text-base leading-relaxed">{children}</li>
+      ),
+      number: ({ children }: any) => (
+        <li className="text-base leading-relaxed">{children}</li>
+      ),
+    },
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -108,7 +167,7 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] flex items-start justify-center p-0 sm:p-4 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto"
+          className="fixed inset-0 z-[9999] flex items-start justify-center p-0 lg:p-8 backdrop-blur-sm overflow-y-auto"
           onClick={handleBackdropClick}
         >
           <motion.div 
@@ -116,7 +175,7 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
             animate={{ scale: 1, opacity: 1, x: 0, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, x: 0, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="relative bg-white rounded-2xl shadow-2xl w-full sm:max-w-5xl min-h-screen sm:min-h-0 sm:my-4 mx-auto"
+            className="relative bg-white rounded-2xl shadow-2xl w-full lg:max-w-md lg:min-h-0 min-h-screen mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
         {/* Close Button */}
@@ -127,20 +186,20 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
           transition={{ duration: 0.2 }}
           className="absolute top-4 right-4 z-20 p-3 bg-white bg-opacity-95 rounded-full shadow-lg hover:bg-opacity-100 transition-all duration-300 ease-in-out touch-manipulation"
         >
-          <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 hover:text-gray-800 transition-colors duration-200" />
+          <X className="w-5 h-5 text-gray-600 hover:text-gray-800 transition-colors duration-200" />
         </motion.button>
 
         {/* Modal Content */}
-        <div className="flex flex-col lg:flex-row min-h-screen sm:min-h-0">
-          {/* Image Section - Full size on mobile (1080x1350 aspect ratio) */}
-          <div className="relative w-full aspect-[1080/1350] sm:h-64 md:h-80 lg:min-h-[600px] lg:w-1/2 lg:aspect-auto overflow-hidden bg-gray-100 flex-shrink-0 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
+        <div className="flex flex-col min-h-screen">
+          {/* Image Section - Mobile style for all screen sizes */}
+          <div className="relative w-full aspect-[1080/1350] overflow-hidden bg-gray-100 flex-shrink-0 rounded-t-2xl">
             {service.icon?.asset ? (
               <Image
                 src={urlForProduct(service.icon).url()}
                 alt={service.icon.alt || service.title}
                 fill
                 className="object-cover object-center transition-opacity duration-300"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 540px"
+                sizes="100vw"
                 priority
 
               />
@@ -155,29 +214,38 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
            </div>
 
           {/* Content */}
-          <div className="p-6 sm:p-6 lg:p-8 lg:w-1/2 flex-1 overflow-y-auto">
+          <div className="p-6 flex-1 overflow-y-auto">
             <div className="space-y-6">
               {/* Header */}
               <div>
-                <div className="mb-6 sm:mb-6">
-                  <div className="flex items-center gap-2 mb-3 sm:mb-2">
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
                   </div>
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-3 leading-tight">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4 leading-tight">
                     {service.title}
                   </h2>
-                  <p className="text-base sm:text-base text-gray-600 leading-relaxed sm:leading-relaxed">
-                    {service.description}
-                  </p>
+                  <div className="prose prose-sm max-w-none">
+                    {service.description && Array.isArray(service.description) && service.description.length > 0 ? (
+                      <PortableText 
+                        value={service.description} 
+                        components={portableTextComponents}
+                      />
+                    ) : (
+                      <p className="text-base text-gray-600 leading-relaxed mb-4">
+                        {typeof service.description === 'string' ? service.description : 'No description available.'}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Price */}
               {service.price && (
                 <div>
-                  <div className="mb-6 sm:mb-6 p-4 sm:p-4 bg-gray-50 rounded-xl sm:rounded-xl">
+                  <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                     <div className="flex flex-col justify-between">
-                      <span className="text-sm sm:text-base text-gray-600 mb-1">Harga Mulai Dari:</span>
-                      <span className="text-xl sm:text-2xl font-bold text-primary">
+                      <span className="text-sm text-gray-600 mb-1">Harga Mulai Dari:</span>
+                      <span className="text-xl font-bold text-primary">
                         {formatPrice(service.price)}
                       </span>
                     </div>
@@ -186,22 +254,65 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
               )}
 
               {/* Features */}
-              {service.features && service.features.length > 0 && (
+              {service.features && (
                 <div>
-                  <div className="mb-6 sm:mb-6">
-                    <h3 className="text-lg sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-3">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       Yang Termasuk:
                     </h3>
-                    <div className="space-y-3 sm:space-y-2">
-                      {service.features.map((feature, index) => (
-                        <div 
-                          key={index} 
-                          className="flex items-start gap-3 sm:gap-3"
-                        >
-                          <Check className="w-5 h-5 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-base sm:text-base text-gray-700 leading-relaxed">{feature}</span>
+                    <div className="prose prose-sm max-w-none">
+                      {Array.isArray(service.features) && service.features.length > 0 ? (
+                        // Handle PortableText array
+                        <PortableText 
+                          value={service.features} 
+                          components={{
+                            block: {
+                              normal: ({ children }: any) => (
+                                <div className="flex items-start gap-3 mb-3">
+                                  <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-base text-gray-700 leading-relaxed">{children}</span>
+                                </div>
+                              ),
+                            },
+                            list: {
+                              bullet: ({ children }: any) => (
+                                <div className="space-y-3">
+                                  {children}
+                                </div>
+                              ),
+                              number: ({ children }: any) => (
+                                <div className="space-y-3">
+                                  {children}
+                                </div>
+                              ),
+                            },
+                            listItem: {
+                              bullet: ({ children }: any) => (
+                                <div className="flex items-start gap-3">
+                                  <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-base text-gray-700 leading-relaxed">{children}</span>
+                                </div>
+                              ),
+                              number: ({ children }: any) => (
+                                <div className="flex items-start gap-3">
+                                  <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-base text-gray-700 leading-relaxed">{children}</span>
+                                </div>
+                              ),
+                            },
+                          }}
+                        />
+                      ) : (
+                        // Fallback for simple text
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-base text-gray-700 leading-relaxed">
+                              {typeof service.features === 'string' ? service.features : 'No features available.'}
+                            </span>
+                          </div>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 </div>
@@ -209,10 +320,10 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
 
               {/* Service Information */}
               <div>
-                <div className="mb-6 sm:mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                  <div className="flex items-center gap-3 sm:gap-2 text-gray-600 py-2">
-                    <MapPin className="w-5 h-5 sm:w-5 sm:h-5 text-primary" />
-                    <span className="text-sm sm:text-sm capitalize">
+                <div className="mb-6 grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-3 text-gray-600 py-2">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <span className="text-sm capitalize">
                       {service.category === 'packages' ? 'Paket Tour' :
                        service.category === 'custom' ? 'Tour Custom' :
                        service.category === 'group' ? 'Tour Grup' :
@@ -223,9 +334,9 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
                     </span>
                   </div>
                   {service.price && (
-                    <div className="flex items-center gap-3 sm:gap-2 text-gray-600 py-2">
-                      <Clock className="w-5 h-5 sm:w-5 sm:h-5 text-primary" />
-                      <span className="text-sm sm:text-sm">
+                    <div className="flex items-center gap-3 text-gray-600 py-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      <span className="text-sm">
                         {service.price.unit === 'person' ? 'Per Orang' :
                          service.price.unit === 'group' ? 'Per Grup' :
                          service.price.unit === 'day' ? 'Per Hari' :
@@ -234,9 +345,9 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
                       </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 sm:gap-2 text-gray-600 py-2">
-                    <Users className="w-5 h-5 sm:w-5 sm:h-5 text-primary" />
-                    <span className="text-sm sm:text-sm">
+                  <div className="flex items-center gap-3 text-gray-600 py-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    <span className="text-sm">
                       {service.isPopular ? 'Populer' : 'Tersedia'}
                     </span>
                   </div>
@@ -245,12 +356,12 @@ export default function ServiceModal({ service, isOpen, onClose }: ServiceModalP
 
               {/* Action Buttons */}
               <div>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 pt-2">
+                <div className="flex flex-col gap-3 pt-2">
                   <a 
                     href="https://wa.me/6287770005801"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 border-2 border-primary bg-primary text-white py-4 sm:py-3 px-6 sm:px-6 rounded-xl sm:rounded-xl text-base sm:text-base font-semibold text-center inline-block hover:bg-primary-dark transition-colors hover:border-primary-dark"
+                    className="flex-1 border-2 border-primary bg-primary text-white py-4 px-6 rounded-xl text-base font-semibold text-center inline-block hover:bg-primary-dark transition-colors hover:border-primary-dark"
                   >
                     Konsultasi Gratis
                   </a>
